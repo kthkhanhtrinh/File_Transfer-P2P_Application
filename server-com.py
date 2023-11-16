@@ -5,10 +5,10 @@ def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_host = '0.0.0.0'
     server_port = 12345
+    client_sockets = []
 
     server_socket.bind((server_host, server_port))
-    server_socket.listen(1)
-    client_sockets = []
+    server_socket.listen(5)
     print(f"Server listening on {server_host}:{server_port}")
 
     while True:
@@ -31,7 +31,7 @@ def start_server():
                 user_register(client_socket)
 
             # Start a new thread to hanent
-            client_thread = threading.Thread(target=handle_client, args=(client_socket,))
+            client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
             client_thread.start()
         except KeyboardInterrupt:
             handle_server_exit(server_socket, client_sockets)
