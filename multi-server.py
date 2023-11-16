@@ -2,7 +2,6 @@ import socket
 import threading
 
 
-
 def user_register(client_socket):
     username = client_socket.recv(1024).decode("utf-8").strip()
     password = client_socket.recv(1024).decode("utf-8").strip()
@@ -67,6 +66,7 @@ def receive_file(client_socket):
 def handle_client(conn, addr):
     print(f"[NEW CONNECTION] {addr} connected.")
 
+    
     connected = True
     while connected:
         option = conn.recv(1024).decode("utf-8").strip()
@@ -97,6 +97,7 @@ def main():
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
         print(f"[ACTIVE CONNECTIONS] {threading.activeCount() - 1}")
+
 
 if __name__ == "__main__":
     main()
