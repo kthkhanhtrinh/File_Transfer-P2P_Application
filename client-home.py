@@ -2,7 +2,7 @@ import socket
 
 def start_client():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_host = '192.168.0.101' #change to your IP addrs
+    server_host = '127.0.0.1' #change to your IP addrs
     server_port = 12345
 
     client_socket.connect((server_host, server_port))
