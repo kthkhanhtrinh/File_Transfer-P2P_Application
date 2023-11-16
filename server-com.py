@@ -26,11 +26,11 @@ def start_server():
                     handle_client(client_socket)
                 else:
                     print("Authentication failed. Closing connection.")
-                    client_socket.close()
+                    # client_socket.close()
             elif option == "register":
                 user_register(client_socket)
 
-            # Start a new thread to handle the client
+            # Start a new thread to hanent
             client_thread = threading.Thread(target=handle_client, args=(client_socket,))
             client_thread.start()
         except KeyboardInterrupt:
@@ -42,6 +42,7 @@ def user_register(client_socket):
 
     print(f"Received new username: {username}, new password: {password}")
 
+    user_acount_file = "users.txt"
     users_file_path = open("users.txt", "r")
     check = checkExitedAccount(username, password, users_file_path)
     users_file_path.close()
@@ -50,7 +51,7 @@ def user_register(client_socket):
         client_socket.send("FAILED".encode("utf-8"))
         return False 
     else: 
-        with open(users_file_path, "a") as file:
+        with open(user_acount_file, "a") as file:
             file.write(f"{username}:{password}\n")
         # client_socket.send("Registration successful. You can now log in.".encode())
         
