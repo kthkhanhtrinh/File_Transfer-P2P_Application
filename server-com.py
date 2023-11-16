@@ -5,10 +5,10 @@ def start_server():
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_host = '0.0.0.0'
     server_port = 12345
+    client_sockets = []
 
     server_socket.bind((server_host, server_port))
-    server_socket.listen(1)
-    client_sockets = []
+    server_socket.listen(5)
     print(f"Server listening on {server_host}:{server_port}")
 
     while True:
@@ -26,12 +26,12 @@ def start_server():
                     handle_client(client_socket)
                 else:
                     print("Authentication failed. Closing connection.")
-                    client_socket.close()
+                    # client_socket.close()
             elif option == "register":
                 user_register(client_socket)
 
-            # Start a new thread to handle the client
-            client_thread = threading.Thread(target=handle_client, args=(client_socket,))
+            # Start a new thread to handle_client
+            client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
             client_thread.start()
         except KeyboardInterrupt:
             handle_server_exit(server_socket, client_sockets)
@@ -42,6 +42,7 @@ def user_register(client_socket):
 
     print(f"Received new username: {username}, new password: {password}")
 
+    user_acount_file = "users.txt"
     users_file_path = open("users.txt", "r")
     check = checkExitedAccount(username, password, users_file_path)
     users_file_path.close()
@@ -50,7 +51,7 @@ def user_register(client_socket):
         client_socket.send("FAILED".encode("utf-8"))
         return False 
     else: 
-        with open(users_file_path, "a") as file:
+        with open(user_acount_file, "a") as file:
             file.write(f"{username}:{password}\n")
         # client_socket.send("Registration successful. You can now log in.".encode())
         
@@ -102,7 +103,7 @@ def receive_file(client_socket):
             file.write(data)
             print("File received successfully")
             client_socket.close()
-
+    
 
 def handle_server_exit(server_socket, client_sockets):
     print("Server is exiting. Closing all connections...")
