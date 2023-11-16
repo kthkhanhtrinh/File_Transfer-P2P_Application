@@ -30,7 +30,7 @@ def start_server():
             elif option == "register":
                 user_register(client_socket)
 
-            # Start a new thread to hanent
+            # Start a new thread to handle_client
             client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
             client_thread.start()
         except KeyboardInterrupt:
