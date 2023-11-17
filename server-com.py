@@ -31,8 +31,8 @@ def start_server():
                 user_register(client_socket)
 
             # Start a new thread to handle_client
-            client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
-            client_thread.start()
+            # client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
+            # client_thread.start()
         except KeyboardInterrupt:
             handle_server_exit(server_socket, client_sockets)
 
