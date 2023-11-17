@@ -8,7 +8,6 @@ def user_register(client_socket):
 
     print(f"Received new username: {username}, new password: {password}")
 
-    user_acount_file = "users.txt"
     users_file_path = open("users.txt", "r")
     check = checkExitedAccount(username, password, users_file_path)
     users_file_path.close()
@@ -17,7 +16,7 @@ def user_register(client_socket):
         client_socket.send("FAILED".encode("utf-8"))
         return False 
     else: 
-        with open(user_acount_file, "a") as file:
+        with open(users_file_path, "a") as file:
             file.write(f"{username}:{password}\n")
         # client_socket.send("Registration successful. You can now log in.".encode())
         
@@ -25,14 +24,13 @@ def user_register(client_socket):
         print("Registration successful")
         return True
 
-
 def authenticate_client(client_socket):
     # Receive username and password separately
     username = client_socket.recv(1024).decode("utf-8").strip()
     password = client_socket.recv(1024).decode("utf-8").strip()
     
     # For debugging, print the received credentials
-    #print(f"Received username: {username}, password: {password}")
+    print(f"Received username: {username}, password: {password}")
 
     users_file = open("users.txt", "r")
     check = checkExitedAccount(username, password, users_file)
@@ -82,8 +80,6 @@ def handle_client(conn, addr):
                 conn.close()
         elif option == "register":
             user_register(conn)
-            conn.close()
-            connected = False
 
     conn.close()
 
@@ -93,8 +89,8 @@ def main():
     server_host = '0.0.0.0'
     server_port = 12345
     server_socket.bind((server_host, server_port))
-    server_socket.listen(5)
-    print(f"Server listening on {server_host}:{server_port}")
+    server_socket.listen(1)
+    #print(f"[LISTENING] Server is listening on {IP}:{PORT}")
 
     while True:
         conn, addr = server_socket.accept()
