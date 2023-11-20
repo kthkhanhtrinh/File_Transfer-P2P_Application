@@ -2,6 +2,8 @@ import socket
 import pickle
 import os
 
+username = ""
+
 def start_client():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_host = '127.0.0.1' #change to your IP addrs
@@ -15,10 +17,9 @@ def start_client():
     if (option == "login"):
         if authenticate_client(client_socket):
             #command publish/fetch to server ->thread
-
+            # client_listen(client_socket)
             #client listen to server ->thread
-            
-            pass
+            client_input(client_socket)
             # send_file(client_socket)
         else:
             print("Authentication failed. Exiting.")
@@ -41,22 +42,23 @@ def client_listen(client_socket):
     if server_command == "ping":
         client_socket.send("ping".encode())
         print("Ping request received. Pinging back to the server.")
-        client_socket.send("pong".encode())
+        # client_socket.send("pong".encode())
     
     if server_command == "quit":
         return
 
 def client_input(client_socket):
     client_command = input("Enter command (publish/fetch), lname, fname: ")
-    client_command, lname, fname = client_command.split(" ")
-
-    client_socket.send(client_command.encode())
-
-    if client_command == "publish":
+    # client_command, lname, fname = client_command.split(" ")
+    if client_command.startswith("publish"):
+        client_command, lname, fname = client_command.split(" ")
+        client_socket.send(client_command.encode())
         handle_client_publish(client_socket, client_command, lname, fname)
 
-    if client_command == "fetch":
-        handle_client_fetch(fname)
+    if client_command.startswith("fetch"):
+        client_command, fname = client_command.split(" ")
+        client_socket.send(client_command.encode())
+        handle_client_fetch(client_socket, fname)
 
 
 def user_register(client_socket):
@@ -93,14 +95,32 @@ def send_file(client_socket):
 
 def handle_client_publish(client_socket, client_command, lname, fname):
     if check_valid_files(lname, fname):
+
         client_socket.send(lname.encode())
         client_socket.send(fname.encode())
     else:
-        print("Wrong lname or fname, Please check again")
+        print("Wrong lname or fname, please check again")
         
 
-def handle_client_fetch(fname):
-    pass
+def handle_client_fetch(client_socket, fname):
+    client_socket.send(fname.encode())
+    if(client_socket.recv(1024).decode() == "FOUND"):
+        file_path = client_socket.recv(1024).decode()
+        file_dir = client_socket.recv(1024).decode()
+        base_fname = os.path.basename(file_path)
+        target_name, user, file = base_fname.split("_")
+        start_download_file(client_socket, target_name, fname)
+        print(target_name)
+    
+def start_download_file(client_socket, target_name, fname):
+    with open("received-file.txt", 'wb') as file:
+        while True:
+            data = client_socket.recv(1024)
+            if not data:
+                break
+            file.write(data)
+    print("File received successful")
+    
 
 
 def check_valid_files(lname, fname):
