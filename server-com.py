@@ -5,6 +5,9 @@ import os
 
 connected_clients = []
 username = ""
+MAX_CLIENT_NUM = 30
+current_client = 0
+
 
 def main():
     print("[STARTING] Server is starting...")
@@ -15,16 +18,21 @@ def main():
     server_socket.listen(5)
     print(f"Server listening on {server_host}:{server_port}")
     client_info = {} 
+    
+    thread = threading.Thread(target=server_input, args=(client_socket, client_address))
+    thread.start()
 
     while True:
         client_socket, addr = server_socket.accept()
         client_address, client_port = addr
         print(f"Connection from {addr}")
-        client_info[client_address] = client_address
+        client_info[current_client] = client_address
+        thread[current_client] = threading
+        handle_client(client_socket, client_address)
+        # thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
+        # thread.start()
 
-        thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
-        thread.start()
-        print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
+        
 
 
 def user_register(client_socket, client_address):
@@ -102,26 +110,23 @@ def handle_client(client_socket, client_address):
         
         if option == "login":
             if authenticate_client(client_socket):
-                #todo input discover/ ping hostname -> thread
-                # server_input(client_socket, client_address)
-                #todo listen publish/ fetch from client -> thread
                 server_listen(client_socket, client_address)
                 connected = False
-
             else:
                 print("Authentication failed. Closing connection.")
                 client_socket.close()
         elif option == "register":
             user_register(client_socket, client_address)
             client_socket.close()
-        
+        else: 
+            pass
         connected = False
         
 
     client_socket.close()
 
 def server_input(client_socket, client_address):
-    server_command, hostname = input("Server command: ").split()
+    server_command, hostname = input("Server command (discover/ping hostname): ").split()
 
     if hostname != client_address:
         print("Wrong hostname\n")
@@ -139,13 +144,15 @@ def server_input(client_socket, client_address):
         for file in files:
             print(file)
 
-    if server_command == "ping":
+    elif server_command == "ping":
         handle_server_ping(client_socket, client_address)
         return
     
-    if server_command == "quit":
-        return
+    elif server_command == "shutdown":
+        client_socket.close()
 
+    else: 
+        print("Invalid command")
 
 def server_listen(client_socket, client_address):
     client_command = client_socket.recv(1024).decode("utf-8").strip()
@@ -247,6 +254,7 @@ def server_listening(client_socket, client_address):
         # client_socket.send("discover".encode())
         handle_server_discover()
     
+#send ip+basename{draft}
 
 if __name__ == "__main__":
     main()

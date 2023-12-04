@@ -1,36 +1,47 @@
 import socket
 import pickle
 import os
+import threading, time
 
 username = ""
+input_thread = None
+listen_thread = None
 
 def start_client():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_host = '127.0.0.1' #change to your IP addrs
+    # server_host = '172.20.10.4'
     server_port = 12345
 
     client_socket.connect((server_host, server_port))
+    while True:
+        option = input("Select option (login/register): ")
+        client_socket.send(option.encode())
 
-    option = input("Select option (login/register): ")
-    client_socket.send(option.encode())
+        if (option == "login"):
+            if authenticate_client(client_socket):
+                input_thread = threading.Thread(target=client_input, args=(client_socket, ))
+                input_thread.start()
+                client_listen(client_socket)
+            else:
+                print("Authentication failed. Exiting.")
+        
+        elif (option == "register"):
+            if user_register(client_socket):
+                print("Register successfully")
+            else:
+                print("Register failed. Exiting")
+        
+        elif (option == "quit"):
+            break
 
-    if (option == "login"):
-        if authenticate_client(client_socket):
-            #command publish/fetch to server ->thread
-            # client_listen(client_socket)
-            #client listen to server ->thread
-            client_input(client_socket)
-            # send_file(client_socket)
         else:
-            print("Authentication failed. Exiting.")
-    elif (option == "register"):
-        if user_register(client_socket):
-            print("Register successfully")
-        else:
-            print("Register failed. Exiting")
+            print("Invalid command!")
+
     client_socket.close()
 
 def client_listen(client_socket):
+    # while True:
     server_command = client_socket.recv(1024).decode("utf-8").strip()
 
     if server_command == "discover":
@@ -39,16 +50,19 @@ def client_listen(client_socket):
         files_data = pickle.dumps(files)
         client_socket.send(files_data)
 
-    if server_command == "ping":
+    elif server_command == "ping":
         client_socket.send("ping".encode())
         print("Ping request received. Pinging back to the server.")
-        # client_socket.send("pong".encode())
     
-    if server_command == "quit":
+    elif server_command == "quit":
         return
+    
+    else: 
+        pass
+        
 
 def client_input(client_socket):
-    client_command = input("Enter command (publish/fetch), lname, fname: ")
+    client_command = input("1.publish lname fname\n2.fetch fname\nEnter command: ")
     # client_command, lname, fname = client_command.split(" ")
     if client_command.startswith("publish"):
         client_command, lname, fname = client_command.split(" ")
@@ -115,7 +129,7 @@ def handle_client_fetch(client_socket, fname):
 def start_download_file(client_socket, target_name, fname):
     with open("received-file.txt", 'wb') as file:
         while True:
-            data = client_socket.recv(1024)
+            data = client_socket.recv(1024).decode().strip()
             if not data:
                 break
             file.write(data)
