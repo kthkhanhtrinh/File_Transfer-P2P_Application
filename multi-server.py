@@ -77,10 +77,10 @@ def handle_client(conn, addr):
                 receive_file(conn)
             else:
                 print("Authentication failed. Closing connection.")
-                conn.close()
+                connected = False
         elif option == "register":
             user_register(conn)
-
+            connected = False
     conn.close()
 
 def main():
