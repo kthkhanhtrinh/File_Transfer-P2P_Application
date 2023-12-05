@@ -4,6 +4,7 @@ data = None
 
 client_open_port = None
 fetch_port = False
+file_sent = False
 
 def listen_from_another_client(): # C1 listen from C2
     print("Port is opening, ready to connect peer!\n")
@@ -95,8 +96,9 @@ def client_recv1(s):
             # filename = s.recv(1024).decode().strip()
             download_file(s)
         elif data.startswith('fetch-request'):
-            _, client_ip, fname, line = data.slipt("_")
-            connect_to_another_client(client_ip, fname, line)
+            _, client_ip, fname, line = data.split("_")
+            threading.Thread(target=connect_to_another_client, args=(client_ip, fname, line)).start()
+            # connect_to_another_client(client_ip, fname, line)
         
         # Server send to fetch request from another client
         else: 
@@ -111,6 +113,8 @@ def download_file(s):
             file.write(data)
             # print("File received successfully")
         file.close()
+        while(not file_sent):
+            pass
         fetch_port = False
     except Exception as e:
         print(f"Failed to open file: {e}")
@@ -129,6 +133,7 @@ def peer_send_file(conn, line):
             conn.send(data)
             data = file.read(1024)
     file.close()
+    file_sent = True
     # print("Sending successful")              
 
 def check_valid_files(lname, fname):
