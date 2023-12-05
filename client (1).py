@@ -107,6 +107,7 @@ def client_recv1(s):
 def download_file(s):
     # print("Writing")
     try:
+        # with open("C:\\Users\\Admin\\Downloads\\received-files.txt", "wb") as file:
         with open("C:\\Users\\khanh\\Downloads\\received-files.txt", "wb") as file:
             data = s.recv(1024)
             # print(data)
@@ -115,7 +116,7 @@ def download_file(s):
         file.close()
         while(not file_sent):
             pass
-        fetch_port = False
+        # fetch_port = False
     except Exception as e:
         print(f"Failed to open file: {e}")
 
