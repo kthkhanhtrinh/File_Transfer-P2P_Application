@@ -2,13 +2,15 @@ import socket, os
 import threading
 data = None
 
+client_open_port = None
 
 def listen_from_another_client(): # C1 listen from C2
+    print("Port is opening, ready to connect peer!\n")
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind(('localhost', 12346))  # Bind to localhost and port 12345
     server_socket.listen()
 
-    
+
     conn, addr = server_socket.accept()
     print(f'Have a connection from {addr}')
 
@@ -20,8 +22,6 @@ def listen_from_another_client(): # C1 listen from C2
                 break
             conn.sendall(data)  # Echoes back the received data
 
-
-    pass
 
 
 def connect_to_another_client(ip):  # C2 connect to C1
@@ -70,6 +70,10 @@ def client_send2(s):
 
 
         s.sendall(msg.encode())
+        if msg.startswith("fetch"):
+            client_open_port = threading.Thread(target=listen_from_another_client, args=(),)
+            client_open_port.start()
+            # listen_from_another_client()
 
 
 def client_recv1(s):
