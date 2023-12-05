@@ -31,11 +31,13 @@ def listen_from_another_client(): # C1 listen from C2
 
 def connect_to_another_client(ip, fname, line):  # C2 connect to C1
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-        client_socket.connect((ip, 12348))  # Connect to the peer
-        peer_send_file(ip, line)
+        try:
+            client_socket.connect((ip, 12348))  # Connect to the peer
+            peer_send_file(ip, line)
         # client_socket.sendall(b'hello from another client')
         # data = client_socket.recv(1024)
-
+        except:
+            print("Connect to ", ip, " failed")
     # print(f'Received from another client: {data.decode()}')
     
 
@@ -114,8 +116,8 @@ def download_file(s):
             file.write(data)
             # print("File received successfully")
         file.close()
-        while(not file_sent):
-            pass
+        # while(not file_sent):
+        #     pass
         # fetch_port = False
     except Exception as e:
         print(f"Failed to open file: {e}")
