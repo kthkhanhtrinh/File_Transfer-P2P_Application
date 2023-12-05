@@ -3,24 +3,28 @@ import threading
 data = None
 
 client_open_port = None
+fetch_port = True
 
 def listen_from_another_client(): # C1 listen from C2
     print("Port is opening, ready to connect peer!\n")
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(('localhost', 12346))  # Bind to localhost and port 12345
-    server_socket.listen()
+    while fetch_port:
+        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_socket.bind(('0.0.0.0', 12346))  # Bind to localhost and port 12345
+        server_socket.listen()
 
 
-    conn, addr = server_socket.accept()
-    print(f'Have a connection from {addr}')
+        conn, addr = server_socket.accept()
+        print(f'Have a connection from {addr}')
 
-    with conn:
-        print(f"Connected by {addr}")
-        while True:
-            data = conn.recv(1024)
-            if not data:
-                break
-            conn.sendall(data)  # Echoes back the received data
+        with conn:
+            print(f"Connected by {addr}")
+            while True:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                conn.sendall(data)  # Echoes back the received data
+
+    print("Fetch port is close")
 
 
 
