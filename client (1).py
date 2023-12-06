@@ -30,14 +30,18 @@ def listen_from_another_client(): # C1 listen from C2
 
 
 def connect_to_another_client(ip, fname, line):  # C2 connect to C1
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as client_socket:
-        try:
-            client_socket.connect((ip, 12348))  # Connect to the peer
-            peer_send_file(ip, line)
-        # client_socket.sendall(b'hello from another client')
-        # data = client_socket.recv(1024)
-        except:
-            print("Connect to ", ip, " failed")
+    peer_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    try:
+        peer_socket.connect((ip, 12348))  # Connect to the peer
+        # peer_send_file(peer_socket, line)
+        try: 
+            peer_socket.send('hello from another client'.encode())
+            print("Send to peer success")
+        except: print("Send fail :((")
+    # data = client_socket.recv(1024)
+    except:
+        print("Connect to", ip, "failed")
     # print(f'Received from another client: {data.decode()}')
     
 
@@ -123,8 +127,12 @@ def download_file(s):
         print(f"Failed to open file: {e}")
 
 def peer_send_file(conn, line):
-    # print("Sending")
-    conn.send("Sending".encode())
+    print("Sending")
+    try: conn.send("Sending".encode())
+    except: 
+        print(f"Send to {conn} fail")
+        return
+
     filename = line[line.rfind("\'") + 1:]
     # conn.send(filename.encode())
     filename = filename[:-1]
