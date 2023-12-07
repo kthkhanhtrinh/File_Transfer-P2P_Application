@@ -5,9 +5,9 @@ public_path = None
 client_open_port = None
 # fetch_port = False
 file_sent = False
-fetch_file = None
+# fetch_file = None
 
-def listen_from_another_client(): # C1 listen from C2
+def listen_from_another_client(fname): # C1 listen from C2
     print("Port is opening, ready to connect peer!\n")
     while True:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -19,7 +19,7 @@ def listen_from_another_client(): # C1 listen from C2
         print(f'Have a connection from {addr}')
         data = conn.recv(1024).decode().strip()
         print(data)
-        download_file(conn, fetch_file)
+        download_file(conn, fname)
         break
 
     print("Fetch port is close")
@@ -67,8 +67,9 @@ def client_send2(s):
             msg = f"fetch_{fname}"
 
         s.sendall(msg.encode())
+        
         if msg.startswith("fetch"):
-            client_open_port = threading.Thread(targetPYTH=listen_from_another_client, args=(),)
+            client_open_port = threading.Thread(target=listen_from_another_client, args=(fname,),)
             client_open_port.start()
 
 
