@@ -19,7 +19,7 @@ def listen_from_another_client(): # C1 listen from C2
         print(f'Have a connection from {addr}')
         data = conn.recv(1024).decode().strip()
         print(data)
-        download_file(conn)
+        download_file(conn, fetch_file)
         break
 
     print("Fetch port is close")
@@ -68,7 +68,7 @@ def client_send2(s):
 
         s.sendall(msg.encode())
         if msg.startswith("fetch"):
-            client_open_port = threading.Thread(target=listen_from_another_client, args=(),)
+            client_open_port = threading.Thread(targetPYTH=listen_from_another_client, args=(),)
             client_open_port.start()
 
 
@@ -82,9 +82,9 @@ def client_recv1(s):
             _, fname = data.split("_")
             print(fname, "no such file founded!")
         
-        elif data == "Sending":
-            # filename = s.recv(1024).decode().strip()
-            download_file(s)
+        # elif data == "Sending":
+        #     # filename = s.recv(1024).decode().strip()
+        #     download_file(s)
         elif data.startswith('fetch-request'):
             _, client_ip, fname, line = data.split("_")
             fetch_file = fname
@@ -98,7 +98,7 @@ def client_recv1(s):
         else: 
             continue
 
-def download_file(s):
+def download_file(s, fetch_file):
     # print("Writing")
     try:
         # with open("C:\\Users\\Admin\\Downloads\\received-files.txt", "wb") as file:
@@ -140,7 +140,8 @@ def check_valid_files(lname, fname):
     full_path = os.path.join(lname, fname)
     return os.path.isfile(full_path)
 
-server_ip = input("Enter server ip: ")
+# server_ip = input("Enter server ip: ")
+server_ip = '192.168.0.124'
 # public_path = input("Enter download path: ")
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((server_ip, 12345))
