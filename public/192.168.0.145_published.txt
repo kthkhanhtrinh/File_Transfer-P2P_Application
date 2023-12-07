@@ -1,2 +1,5 @@
 C:\Users\khanh\output.txt
 C:\Users\khanh\kernel.txt
+C:\Users\khanh\kernel1.txt
+C:\Users\khanh\image.txt
+C:\Users\khanh\image1.txt
