@@ -158,6 +158,6 @@ def check_valid_files(lname, fname):
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     # s.connect(('10.128.158.79', 12345))
     # s.connect(('localhost', 12345))
-    s.connect(('192.168.0.124', 12345))
+    s.connect(('192.168.0.145', 12345))
     threading.Thread(target=client_send2, args=(s,)).start()
     client_recv1(s)
