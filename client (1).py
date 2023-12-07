@@ -3,12 +3,12 @@ import threading
 data = None
 
 client_open_port = None
-fetch_port = False
+# fetch_port = False
 file_sent = False
 
 def listen_from_another_client(): # C1 listen from C2
     print("Port is opening, ready to connect peer!\n")
-    while fetch_port:
+    while True:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_socket.bind(('0.0.0.0', 12348))  # Bind to localhost and port 12345
         server_socket.listen()
@@ -37,7 +37,8 @@ def connect_to_another_client(ip, fname, line):  # C2 connect to C1
         # peer_send_file(peer_socket, line)
         try: 
             peer_socket.send('hello from another client'.encode())
-            print("Send to peer success")
+            peer_send_file(peer_socket, line)
+            # print("Send to peer success")
         except: print("Send fail :((")
     # data = client_socket.recv(1024)
     except:
@@ -84,7 +85,7 @@ def client_send2(s):
         if msg.startswith("fetch"):
             client_open_port = threading.Thread(target=listen_from_another_client, args=(),)
             client_open_port.start()
-            fetch_port = True
+            # fetch_port = True
             # threading.Thread(target=listen_from_another_client, args=(),).start()
             # listen_from_another_client()
 
@@ -103,6 +104,9 @@ def client_recv1(s):
             download_file(s)
         elif data.startswith('fetch-request'):
             _, client_ip, fname, line = data.split("_")
+            print(client_ip)
+            print(fname)
+            print(line)
             threading.Thread(target=connect_to_another_client, args=(client_ip, fname, line)).start()
             # connect_to_another_client(client_ip, fname, line)
         
@@ -133,19 +137,19 @@ def peer_send_file(conn, line):
         print(f"Send to {conn} fail")
         return
 
-    filename = line[line.rfind("\'") + 1:]
-    # conn.send(filename.encode())
-    filename = filename[:-1]
-    print(filename)
-    with open(filename, 'rb') as file:
+    # filename = line[line.rfind("\'") + 1:]
+    # # conn.send(filename.encode())
+    # filename = filename[:-1]
+    # print(filename)
+    with open(line, 'rb') as file:
         data = file.read(1024)
-        # print(data)
+        print(data)
         while data:
             conn.send(data)
             data = file.read(1024)
     file.close()
     file_sent = True
-    # print("Sending successful")              
+    print("Send file successful")              
 
 def check_valid_files(lname, fname):
     full_path = os.path.join(lname, fname)
