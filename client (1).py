@@ -10,7 +10,7 @@ def listen_from_another_client(): # C1 listen from C2
     print("Port is opening, ready to connect peer!\n")
     while fetch_port:
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.bind(('0.0.0.0', 12346))  # Bind to localhost and port 12345
+        server_socket.bind(('0.0.0.0', 12348))  # Bind to localhost and port 12345
         server_socket.listen()
 
 
@@ -82,10 +82,10 @@ def client_send2(s):
 
         s.sendall(msg.encode())
         if msg.startswith("fetch"):
-            # client_open_port = threading.Thread(target=listen_from_another_client, args=(),)
-            # client_open_port.start()
+            client_open_port = threading.Thread(target=listen_from_another_client, args=(),)
+            client_open_port.start()
             fetch_port = True
-            threading.Thread(target=listen_from_another_client, args=(),).start()
+            # threading.Thread(target=listen_from_another_client, args=(),).start()
             # listen_from_another_client()
 
 
