@@ -1,10 +1,11 @@
 import socket, os
 import threading
 data = None
-
+public_path = None
 client_open_port = None
 # fetch_port = False
 file_sent = False
+fetch_file = None
 
 def listen_from_another_client(): # C1 listen from C2
     print("Port is opening, ready to connect peer!\n")
@@ -20,13 +21,6 @@ def listen_from_another_client(): # C1 listen from C2
         print(data)
         download_file(conn)
         break
-        # with conn:
-        #     print(f"Connected by {addr}")
-        #     while True:
-        #         data = conn.recv(1024)
-        #         if not data:
-        #             break
-        #         conn.sendall(data)  # Echoes back the received data
 
     print("Fetch port is close")
 
@@ -71,26 +65,12 @@ def client_send2(s):
         if msg.startswith("fetch"):
             _, fname = msg.split(" ")
             msg = f"fetch_{fname}"
-            # try:
-            #     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as u:
-                    
-            #         # msg = "Still coding please wait"
-            #         #def open port
-            #         # listen_from_another_client()
-
-            # except Exception:
-            #     print("Unable to get IP Address")
-
-        #if msg == "Sending":
-            #download_file(s)
 
         s.sendall(msg.encode())
         if msg.startswith("fetch"):
             client_open_port = threading.Thread(target=listen_from_another_client, args=(),)
             client_open_port.start()
-            # fetch_port = True
-            # threading.Thread(target=listen_from_another_client, args=(),).start()
-            # listen_from_another_client()
+
 
 
 def client_recv1(s):
@@ -107,9 +87,10 @@ def client_recv1(s):
             download_file(s)
         elif data.startswith('fetch-request'):
             _, client_ip, fname, line = data.split("_")
-            print(client_ip)
-            print(fname)
-            print(line)
+            fetch_file = fname
+            # print(client_ip)
+            # print(fname)
+            # print(line)
             threading.Thread(target=connect_to_another_client, args=(client_ip, fname, line)).start()
             # connect_to_another_client(client_ip, fname, line)
         
@@ -121,7 +102,7 @@ def download_file(s):
     # print("Writing")
     try:
         # with open("C:\\Users\\Admin\\Downloads\\received-files.txt", "wb") as file:
-        with open("C:\\Users\\khanh\\Downloads\\received-files.txt", "wb") as file:
+        with open(f"C:\\Users\\khanh\\Downloads\\{fetch_file}", "wb") as file:
             data = s.recv(1024)
             # print(data)
             file.write(data)
@@ -141,10 +122,6 @@ def peer_send_file(conn, line):
         print(f"Send to {conn} fail")
         return
 
-    # filename = line[line.rfind("\'") + 1:]
-    # # conn.send(filename.encode())
-    # filename = filename[:-1]
-    # print(filename)
     with open(line, 'rb') as file:
         data = file.read(1024)
         # print(data)
@@ -163,10 +140,9 @@ def check_valid_files(lname, fname):
     full_path = os.path.join(lname, fname)
     return os.path.isfile(full_path)
 
+server_ip = input("Enter server ip: ")
+# public_path = input("Enter download path: ")
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    # s.connect(('10.128.158.79', 12345))
-    # s.connect(('localhost', 12345))
-    #s.connect(('192.168.0.124', 12345))
-    s.connect(('192.168.0.145', 12345))
+    s.connect((server_ip, 12345))
     threading.Thread(target=client_send2, args=(s,)).start()
     client_recv1(s)
