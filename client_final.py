@@ -17,8 +17,8 @@ def listen_from_another_client(fname): # C1 listen from C2
 
         conn, addr = server_socket.accept()
         print(f'Have a connection from {addr}')
-        data = conn.recv(1024).decode().strip()
-        print(data)
+        # data = conn.recv(1024).decode().strip()
+        # print(data)
         download_file(conn, fname)
         break
 
@@ -33,7 +33,7 @@ def connect_to_another_client(ip, fname, line):  # C2 connect to C1
         peer_socket.connect((ip, 12348))  # Connect to the peer
         # peer_send_file(peer_socket, line)
         try: 
-            peer_socket.send('hello from another client'.encode())
+            # peer_socket.send('hello from another client'.encode())
             peer_send_file(peer_socket, line)
             # print("Send to peer success")
         except: print("Send fail :((")
@@ -118,10 +118,10 @@ def download_file(s, fetch_file):
 
 def peer_send_file(conn, line):
     print("Sending")
-    try: conn.send("Sending".encode())
-    except: 
-        print(f"Send to {conn} fail")
-        return
+    # try: conn.send("Sending".encode())
+    # except: 
+    #     print(f"Send to {conn} fail")
+    #     return
 
     with open(line, 'rb') as file:
         data = file.read(1024)
@@ -132,10 +132,6 @@ def peer_send_file(conn, line):
     file.close()
     file_sent = True
     print("Send file successful")              
-def peer_rev(s):
-    data = s.recv(1024).decode().strip()
-    if data == "Sending":
-        download_file(s)
 
 def check_valid_files(lname, fname):
     full_path = os.path.join(lname, fname)
