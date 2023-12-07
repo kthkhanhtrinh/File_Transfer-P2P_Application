@@ -102,12 +102,15 @@ def client_recv1(s):
 def download_file(s, fetch_file):
     # print("Writing")
     try:
+        total_size = s.recv(1024)
+        recv_size = 0;
         # with open("C:\\Users\\Admin\\Downloads\\received-files.txt", "wb") as file:
         with open(f"C:\\Users\\khanh\\Downloads\\{fetch_file}", "wb") as file:
-            data = s.recv(1024)
-            # print(data)
-            file.write(data)
-            # print("File received successfully")
+            while recv_size < total_size:
+                data = s.recv(1024)
+                # print(data)
+                file.write(data)
+                # print("File received successfully")
         file.close()
         print("File download success")
         # while(not file_sent):
@@ -123,12 +126,28 @@ def peer_send_file(conn, line):
     #     print(f"Send to {conn} fail")
     #     return
 
+    # with open(line, 'rb') as file:
+    #     data = file.read(1024)
+    #     # print(data)
+    #     while data:
+    #         conn.send(data)
+    #         data = file.read(1024)
+
     with open(line, 'rb') as file:
-        data = file.read(1024)
-        # print(data)
-        while data:
+        # Get the total size of the file
+        total_size = os.path.getsize(line)
+
+        # Read and send the file in chunks
+        chunk_size = 1024
+        total_bytes_sent = 0
+        conn.send(total_size)
+        while total_bytes_sent < total_size:
+            data = file.read(chunk_size)
+            if not data:
+                break
             conn.send(data)
-            data = file.read(1024)
+            total_bytes_sent += len(data)
+
     file.close()
     file_sent = True
     print("Send file successful")              
