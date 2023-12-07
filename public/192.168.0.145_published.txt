@@ -1,1 +1,2 @@
 C:\Users\khanh\output.txt
+C:\Users\khanh\kernel.txt
