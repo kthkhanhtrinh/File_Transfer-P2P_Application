@@ -43,14 +43,6 @@ def server_input(): # ping/discover
             else:
                 print(f"{ip} offline")
         
-
-        
-        # client_conn = client_connections.get(ip)
-        # if client_conn:
-        #     client_conn.sendall(message.encode())
-        # else:
-        #     print(f"No active connection found for IP {ip}")
-    
 def checkOnline(ip):
     if ip in client_connections:
         return True
@@ -124,11 +116,11 @@ def search_fname(conn, fname): #conn → ip from fetch request client
 def server_send_file(conn, file_path, line):
     # print("Sending")
     conn.send("Sending".encode())
-    filename = line[line.rfind("\'") + 1:]
+    # filename = line[line.rfind("\'") + 1:]
     # conn.send(filename.encode())
-    filename = filename[:-1]
-    print(filename)
-    with open(filename, 'rb') as file:
+    # filename = filename[:-1]
+    # print(filename)
+    with open(line, 'rb') as file:
         data = file.read(1024)
         # print(data)
         while data:
