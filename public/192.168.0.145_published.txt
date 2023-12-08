@@ -3,3 +3,6 @@ C:\Users\khanh\kernel.txt
 C:\Users\khanh\kernel1.txt
 C:\Users\khanh\image.txt
 C:\Users\khanh\image1.txt
+C:\Users\khanh\OS.pdf
+C:\Users\khanh\mario40.png
+C:\Users\khanh\client-1.py
