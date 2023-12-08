@@ -20,6 +20,7 @@ def listen_from_another_client(fname): # C1 listen from C2
         # data = conn.recv(1024).decode().strip()
         # print(data)
         download_file(conn, fname)
+        server_socket.close()
         break
 
     print("Fetch port is close")
@@ -31,9 +32,7 @@ def connect_to_another_client(ip, fname, line):  # C2 connect to C1
 
     try:
         peer_socket.connect((ip, 12348))  # Connect to the peer
-        # peer_send_file(peer_socket, line)
         try: 
-            # peer_socket.send('hello from another client'.encode())
             peer_send_file(peer_socket, line)
             # print("Send to peer success")
         except: print("Send fail :((")
@@ -102,17 +101,18 @@ def client_recv1(s):
 def download_file(s, fetch_file):
     # print("Writing")
     try:
-        total_size = s.recv(1024)
-        recv_size = 0;
+        file_size_str = s.recv(1024).decode()
+        file_size = int(file_size_str)
         # with open("C:\\Users\\Admin\\Downloads\\received-files.txt", "wb") as file:
-        with open(f"C:\\Users\\khanh\\Downloads\\{fetch_file}", "wb") as file:
-            while recv_size < total_size:
+        with open(f"C:/Users/khanh/Downloads/{fetch_file}", "wb") as file:
+            total_received = 0
+            while total_received < file_size:
                 data = s.recv(1024)
-                # print(data)
+                if not data:
+                    break
                 file.write(data)
-                # print("File received successfully")
-        file.close()
-        print("File download success")
+                total_received += len(data)
+            print("File download success")
         # while(not file_sent):
         #     pass
         # fetch_port = False
@@ -120,37 +120,17 @@ def download_file(s, fetch_file):
         print(f"Failed to open file: {e}")
 
 def peer_send_file(conn, line):
-    print("Sending")
-    # try: conn.send("Sending".encode())
-    # except: 
-    #     print(f"Send to {conn} fail")
-    #     return
-
-    # with open(line, 'rb') as file:
-    #     data = file.read(1024)
-    #     # print(data)
-    #     while data:
-    #         conn.send(data)
-    #         data = file.read(1024)
+    file_size = os.path.getsize(line)
+    conn.send(str(file_size).encode())
 
     with open(line, 'rb') as file:
-        # Get the total size of the file
-        total_size = os.path.getsize(line)
-
-        # Read and send the file in chunks
-        chunk_size = 1024
-        total_bytes_sent = 0
-        conn.send(total_size)
-        while total_bytes_sent < total_size:
-            data = file.read(chunk_size)
-            if not data:
-                break
+        print("Sending file...")
+        data = file.read(1024)
+        while data:
             conn.send(data)
-            total_bytes_sent += len(data)
-
-    file.close()
-    file_sent = True
-    print("Send file successful")              
+            data = file.read(1024)
+        print("File sent successfully")
+ 
 
 def check_valid_files(lname, fname):
     full_path = os.path.join(lname, fname)
