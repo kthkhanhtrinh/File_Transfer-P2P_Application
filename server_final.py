@@ -3,7 +3,7 @@ import threading
 
 # Dictionary to keep track of client connections using their IP as key
 client_connections = {}
-public_path = "C:\\Users\\khanh\\OneDrive - hcmut.edu.vn\\Documents\\SCHOOL MATERIAL\\1.Computer_Network\\Ass1\\public"
+public_path = "/public"
 
 
 def server_input(): # ping/discover
@@ -15,8 +15,6 @@ def server_input(): # ping/discover
 
         if not (command.startswith("ping") or command.startswith("discover")):
             print("Error command, enter again")
-            # if command.startswith("quit"):
-            #     break
             continue
         
         command, ip = command.split(" ")
@@ -88,7 +86,6 @@ def server_recv(conn, ip): #publish/fetch server know who send command to the se
 
 def server_send(conn, msg):
     conn.send(msg.encode())
-    # pass
 
 def search_fname(conn, fname): #conn → ip from fetch request client
     
@@ -107,19 +104,13 @@ def search_fname(conn, fname): #conn → ip from fetch request client
                         return f"{peer_ip}_{line}"
 
     print("Found not thing")
-    # 
-    # conn.send(f"fetch fail_{fname}".encode()) 
-   #  client_connections[ip] = conn
+
                         
                         
 
 def server_send_file(conn, file_path, line):
     # print("Sending")
     conn.send("Sending".encode())
-    # filename = line[line.rfind("\'") + 1:]
-    # conn.send(filename.encode())
-    # filename = filename[:-1]
-    # print(filename)
     with open(line, 'rb') as file:
         data = file.read(1024)
         # print(data)
