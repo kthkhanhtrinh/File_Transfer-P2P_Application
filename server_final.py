@@ -69,11 +69,11 @@ def server_recv(conn, ip): #publish/fetch server know who send command to the se
                                 lines_found = True
                                 break
                     file.close()
-                except:
-                    if lines_found == False:
-                        with open(file_path, "a") as file:
-                            file.write(file_str)
-                            print(f"Published file from {ip}: {lname + fname}")
+                
+                if lines_found == False:
+                    with open(file_path, "a") as file:
+                        file.write(file_str)
+                        print(f"Published file from {ip}: {lname + fname}")
 
 
                             
