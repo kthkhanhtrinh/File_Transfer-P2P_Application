@@ -1,3 +1,0 @@
-admin:123
-tyler:phan
-kt:123
