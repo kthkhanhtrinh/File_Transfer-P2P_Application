@@ -69,7 +69,8 @@ def server_recv(conn, ip): #publish/fetch server know who send command to the se
                                 lines_found = True
                                 break
                     file.close()
-                
+                except:
+                    pass
                 if lines_found == False:
                     with open(file_path, "a") as file:
                         file.write(file_str)
