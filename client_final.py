@@ -95,6 +95,7 @@ def download_file(s, fetch_file):
             total_received = 0
             while total_received < file_size:
                 data = s.recv(1024)
+                print(len(data))
                 if not data:
                     break
                 file.write(data)
@@ -113,7 +114,7 @@ def peer_send_file(conn, line):
         data = file.read(1024)
         while data:
             conn.send(data)
-            print(data)
+            print(len(data))
             data = file.read(1024)
         print("File sent successfully")
  
@@ -122,8 +123,8 @@ def check_valid_files(lname, fname):
     full_path = os.path.join(lname, fname)
     return os.path.isfile(full_path)
 
-# server_ip = input("Enter server ip: ")
-server_ip = '192.168.0.124'
+server_ip = input("Enter server ip: ")
+# server_ip = '192.168.0.124'
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.connect((server_ip, 12345))
