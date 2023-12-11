@@ -3,7 +3,7 @@ import threading
 
 # Dictionary to keep track of client connections using their IP as key
 client_connections = {}
-public_path = "/public"
+public_path = "C:/Users/khanh/OneDrive/Desktop/CN_Ass1/public"
 
 
 def server_input(): # ping/discover
@@ -56,9 +56,29 @@ def server_recv(conn, ip): #publish/fetch server know who send command to the se
             if data.startswith("publish"):
                 _, lname, fname = data.split("_")
                 file_path = os.path.join(public_path, f"{ip}_published.txt")
-                with open(file_path, "a") as file:
-                    file.write(lname + fname + '\n')
-                print(f"Published file from {ip}: {lname + fname}")
+                file_str = lname + fname + '\n'
+                lines_found = False
+                try:
+                    with open(file_path, "r") as file:
+                        lines = file.readlines()
+                        for i, line in enumerate(lines):
+                            if line == file_str:
+                                # Replacing the existing line with the new one
+                                lines[i] = file_str
+                                print("File repaced")
+                                lines_found = True
+                                break
+                    file.close()
+                except:
+                    if lines_found == False:
+                        with open(file_path, "a") as file:
+                            file.write(file_str)
+                            print(f"Published file from {ip}: {lname + fname}")
+
+
+                            
+                    # with open(file_path, "a") as file:
+
                 
             if data.startswith("fetch"):
                 _, fname = data.split("_")
